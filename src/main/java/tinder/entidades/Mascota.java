@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
@@ -38,11 +39,20 @@ private Date alta;
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @OneToOne
+    private Foto foto;
 
     /**
      * get y set
      */
+    public Foto getFoto() {
+        return foto;
+    }
     
+    public void setFoto(Foto foto) {
+        this.foto = foto;
+    }
+
     public Sexo getSexo() {
         return sexo;
     }
