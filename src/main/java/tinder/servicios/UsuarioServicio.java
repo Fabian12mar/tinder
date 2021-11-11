@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tinder.entidades.Foto;
@@ -41,7 +42,12 @@ public class UsuarioServicio implements UserDetailsService {
         usuario.setNombre(nombre);
         usuario.setApellido(apellido);
         usuario.setMail(mail);
-        usuario.setClave(clave);
+ 
+//generamos variable 
+        String encriptada = new BCryptPasswordEncoder().encode(clave);
+//al usuario lo persistimos con la clave encriptada
+        usuario.setClave(encriptada);
+        
         usuario.setAlta(new Date());
 
         Foto foto = fotoServicio.guardar(archivo);
@@ -69,7 +75,11 @@ public class UsuarioServicio implements UserDetailsService {
             usuario.setApellido(apellido);
             usuario.setNombre(nombre);
             usuario.setMail(mail);
-            usuario.setClave(clave);
+            
+            //generamos variable 
+        String encriptada = new BCryptPasswordEncoder().encode(clave);
+//al usuario lo persistimos con la clave encriptada
+        usuario.setClave(encriptada);
 
             String idFoto = null;
             if (usuario.getFoto() != null) {
