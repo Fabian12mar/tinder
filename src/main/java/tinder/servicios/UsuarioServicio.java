@@ -1,9 +1,17 @@
 package tinder.servicios;
 //@autor FABIAN C
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import tinder.entidades.Foto;
@@ -12,14 +20,14 @@ import tinder.errores.ErrorServicio;
 import tinder.repositorios.UsuarioRepositorio;
 
 @Service
-public class UsuarioServicio {
+public class UsuarioServicio implements UserDetailsService {
 
     /* como atributo de esta class ponemos el repositorio y con Autowired la 
     variable la inicializa el servidor de app, no hace falta 
     UsuarioRepositorio = new UsuarioRepositorio*/
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
-    
+
     @Autowired
     private FotoServicio fotoServicio;
 
@@ -38,7 +46,7 @@ public class UsuarioServicio {
 
         Foto foto = fotoServicio.guardar(archivo);
         usuario.setFoto(foto);
-        
+
         usuarioRepositorio.save(usuario);
 
     }
@@ -62,11 +70,11 @@ public class UsuarioServicio {
             usuario.setNombre(nombre);
             usuario.setMail(mail);
             usuario.setClave(clave);
-            
+
             String idFoto = null;
-            if(usuario.getFoto() != null){
+            if (usuario.getFoto() != null) {
                 idFoto = usuario.getFoto().getId();
-            } 
+            }
 
             Foto foto = fotoServicio.actualizar(idFoto, archivo);
             usuario.setFoto(foto);
@@ -83,10 +91,10 @@ public class UsuarioServicio {
         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
             usuario.setBaja(new Date());
-            
-  usuarioRepositorio.save(usuario);
-            
-        }else {
+
+            usuarioRepositorio.save(usuario);
+
+        } else {
             throw new ErrorServicio("No se encontro el usuario solicitado. ");
         }
     }
@@ -96,17 +104,17 @@ public class UsuarioServicio {
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
-/* a diferencia del metodo deshabilitar aqui borramos la fecha de baja y 
+            /* a diferencia del metodo deshabilitar aqui borramos la fecha de baja y 
    lo guardamos */
             usuario.setBaja(null);
-            
-  usuarioRepositorio.save(usuario);
-            
-        }else {
+
+            usuarioRepositorio.save(usuario);
+
+        } else {
             throw new ErrorServicio("No se encontro el usuario solicitado. ");
         }
     }
-    
+
     /* creamos un metodo validar para no repetir la logica de validar de arriba,
  traemos el codigo de arriba aqui y desde registrar llamamos a este metodo*/
     private void validar(String nombre, String apellido, String mail, String clave) throws ErrorServicio {
@@ -126,6 +134,37 @@ public class UsuarioServicio {
             throw new ErrorServicio("La clave del usuario no puede ser nula y tiene que tener mas de 6 digitos");
         }
 
+    }
+
+    /* este metodo se llama cuando el ususario quiere autentificarse en la plataforma,
+ Spring Security llama a este metodo, si existe un usuario con el mail
+ que ingreso en el formulario le crea estos 3 permisos o accesos, y los pasa
+  al constructor de usuario de spring*/
+    @Override
+    public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepositorio.buscarPorMail(mail);
+        if (usuario != null) {
+
+            List<GrantedAuthority> permisos = new ArrayList<>();
+
+            GrantedAuthority p1 = new SimpleGrantedAuthority("MODULO_FOTOS");
+            permisos.add(p1);
+
+            GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
+            permisos.add(p2);
+
+            GrantedAuthority p3 = new SimpleGrantedAuthority("MODULO_VOTOS");
+            permisos.add(p3);
+
+    /* pasamos los datos del usuario y la lista de permisos al constructor
+            de usuario de Spring Security */
+            User user = new User(usuario.getMail(), usuario.getClave(), permisos);
+            return user;
+
+        } else {
+            // si no existe retornamos un usuario vacio
+            return null;
+        }
     }
 
 }

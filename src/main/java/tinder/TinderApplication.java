@@ -9,5 +9,5 @@ public class TinderApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TinderApplication.class, args);
 	}
-
+        
 }
