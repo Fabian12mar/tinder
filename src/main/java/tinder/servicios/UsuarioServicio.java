@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,11 +29,15 @@ public class UsuarioServicio implements UserDetailsService {
     UsuarioRepositorio = new UsuarioRepositorio*/
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
+    
+    @Autowired
+    private NotificacionServicio notificacionServicio;
 
     @Autowired
     private FotoServicio fotoServicio;
 
-//metodo registrar o CREAR  
+//metodo registrar o CREAR 
+    @Transactional
     public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
 
         validar(nombre, apellido, mail, clave);
@@ -54,9 +59,14 @@ public class UsuarioServicio implements UserDetailsService {
         usuario.setFoto(foto);
 
         usuarioRepositorio.save(usuario);
+ 
+ //le damos bienvenida al usuario recien registrado
+ //cuerpo de mens, titulo y mail 
+        notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
 
     }
 
+    @Transactional
     public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
 
         validar(nombre, apellido, mail, clave);
@@ -95,6 +105,7 @@ public class UsuarioServicio implements UserDetailsService {
 
     }
 
+    @Transactional
     public void deshabilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
@@ -109,6 +120,7 @@ public class UsuarioServicio implements UserDetailsService {
         }
     }
 
+    @Transactional
     public void habilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);

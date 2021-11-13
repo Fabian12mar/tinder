@@ -13,6 +13,10 @@ import tinder.repositorios.VotoRepositorio;
 
 @Service
 public class VotoServicio {
+    
+ //vinculamos la notificacion de mail a las acciones de votar
+    @Autowired
+    private NotificacionServicio notificacionServicio;
 
     @Autowired
     private MascotaRepositorio mascotaRepositorio;
@@ -45,6 +49,11 @@ public class VotoServicio {
         if (respuesta2.isPresent()) {
             Mascota mascota2 = respuesta2.get();
             voto.setMascota2(mascota2);
+            
+ //accion de enviar mail cuando la mascota fue votada
+ ////cuerpo de mens, titulo y mail
+ notificacionServicio.enviar("Tu mascota ha sido votada! ", "Tinder de mascotas", mascota2.getUsuario().getMail());
+            
         } else {
             throw new ErrorServicio("No existe una mascota vinculada a ese identificador. ");
         }
@@ -61,7 +70,13 @@ public class VotoServicio {
             voto.setRespuesta(new Date());
 
             if (voto.getMascota2().getUsuario().getId().equals(idUsuario)) {
+                
+//accion de enviar mail cuando se responde un voto
+ ////cuerpo de mens, titulo y mail
+ notificacionServicio.enviar("Tu mascota fue correspondida! ", "Tinder de mascotas", voto.getMascota1().getUsuario().getMail());
+                
                 votoRepositorio.save(voto);
+                
             } else {
                 throw new ErrorServicio("No tiene permisos para realizar la operacion. ");
             }

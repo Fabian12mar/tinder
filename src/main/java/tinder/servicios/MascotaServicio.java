@@ -3,6 +3,7 @@ package tinder.servicios;
 
 import java.util.Date;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,7 @@ public class MascotaServicio {
     @Autowired
     private FotoServicio fotoServicio;
 
+    @Transactional
     public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo) throws ErrorServicio {
 
         Usuario usuario = usuarioRepositorio.findById(idUsuario).get();
@@ -44,6 +46,7 @@ public class MascotaServicio {
 
     }
 
+    @Transactional
     public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo) throws ErrorServicio {
 
         validar(nombre, sexo);
@@ -75,7 +78,8 @@ public class MascotaServicio {
         }
     }
 
-    public void elimintar(String idUsuario, String idMascota) throws ErrorServicio {
+   @Transactional 
+    public void eliminar(String idUsuario, String idMascota) throws ErrorServicio {
 
         Optional<Mascota> respuesta = mascotaRepositorio.findById(idMascota);
         if (respuesta.isPresent()) {
