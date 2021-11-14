@@ -8,4 +8,7 @@ PRIMER PUSH A RAMA DEVELOP
 spring-boot run OK, Y YA NO ME PIDIO LA CLAVE PARA ACCEDER Y MOSTRAR EL HTML INDEX EN EL localhost:8080, por la clase ConfiguracionesSeguridad antes agregada.
 Creamos una clase NotificacionServicio para que envie las notificaciones por mail, despues este servicio lo vamos a vincular en el UsuarioServicio, para que una vez que se registre le damos la bienvenida, despues tambien vinculamos con las acciones de VotoServicio para que enviemos notificacion cuando mascota fue votada y cuando se le devuelve o corresponde un voto.
 Por ultimo marcamos los metodos QUE GENERAN MODIFICACIONES en la base de datos, como TRANSACCIONALES, de esta manera decimos que si el metodo se ejecuta SIN LANZAR EXCEPCIONES entonces se hace un comit a la base de datos, si el metodo, o un metodo llamado dentro del metodo, lanza una excepcion y no es atrapada se vuelve atras (rollback) con la transaccion y no se aplica nada en la base de datos. (metodos validar y de notificacion no se marcan, no generan modificaciones en la base de datos)
+SEGUNDO PUSH A DEVELOP
+ERROR por mailSender en Servicio de Notificaciones,  modificamos archivo application.properties en other sources.
+
 continuar video 9 min 
