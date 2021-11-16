@@ -13,6 +13,7 @@ Finalizo backend.
 SEGUNDO PUSH A DEVELOP
 ERROR por mailSender en Servicio de Notificaciones,  modifico archivo application.properties en other sources.
 Creo rama LOGIN, subo rama a remoto.
-Trabajo en local en rama LOGIN. Comienzo modelo Vista Controlador, L
+Trabajo en local en rama LOGIN. Comienzo modelo Vista Controlador, Inicio, Login y Registro.
+Copio los html en la carpeta templates
 
 continuar video 9 min 
