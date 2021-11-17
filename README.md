@@ -16,6 +16,7 @@ ERROR por mailSender en Servicio de Notificaciones,  modifico archivo applicatio
 Creo rama LOGIN, subo rama a remoto.
 -------------------------------------------------------------------------------------------------------------------------------------------
 Trabajo en local en rama LOGIN. Comienzo modelo Vista Controlador, Inicio, Login y Registro.
-Copio los html en la carpeta templates
+Copio los html en la carpeta templates y css en carpeta static. 
+Modifico las vistas html: agrego en los botones en los href las url de los controladores. Con Thymeleaf se puede hacer segmentos de la pagina para que las PARTES REPETITIVAS DE LAS PAGINAS no haiga que agregarlas en todas las plantillas.
 
-continuar video 9 min 
+continuar video ...
