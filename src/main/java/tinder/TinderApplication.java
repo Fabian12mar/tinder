@@ -21,4 +21,6 @@ public class TinderApplication {
         public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
           auth.userDetailsService(usuarioServicio).passwordEncoder(new BCryptPasswordEncoder());
         }
+        
+        
 }
