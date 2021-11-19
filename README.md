@@ -19,5 +19,6 @@ Creo rama LOGIN, subo rama a remoto.
 Trabajo en local en rama LOGIN. Comienzo modelo Vista Controlador, Inicio, Login y Registro.
 Copio los html en la carpeta templates y css en carpeta static. 
 Modifico las vistas html: agrego en los botones en los href las url de los controladores. Con Thymeleaf se puede hacer segmentos de la pagina para que las PARTES REPETITIVAS DE LAS PAGINAS no haiga que agregarlas en todas las plantillas.
+Arreglo conflictos MERGE LOGIN A DEVELOP, con Visual Studio Code, borro rama LOGIN local y remota. Por ahora seguire trabajando solo en rama develop sin crear ramas.
 
 continuar video ...
