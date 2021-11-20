@@ -68,15 +68,26 @@ ERROR por mailSender en Servicio de Notificaciones,  modifico archivo
 application.properties en other sources.
 Creo rama LOGIN, subo rama a remoto.
 --------------------------------------------------------------------------------
-Trabajo en local en rama LOGIN. Comienzo modelo Vista Controlador, Inicio,
-Login y Registro.
+Trabajo en local en rama LOGIN. 
+Comienzo modelo Vista Controlador, INICIO, LOGIN Y REGISTRO.
 Copio los html en la carpeta templates y css en carpeta static. 
 Modifico las vistas html: agrego en los botones en los href las url de los
 controladores. Con Thymeleaf se puede hacer segmentos de la pagina para que las
 PARTES REPETITIVAS DE LAS PAGINAS no haiga que agregarlas en todas las plantillas.
 Arreglo conflictos MERGE LOGIN A DEVELOP, con Visual Studio Code, borro rama LOGIN
-local y remota. Por ahora seguire trabajando solo en rama develop sin crear ramas.
+local y remota. 
+Por ahora seguire trabajando solo en rama develop sin ramas.
 Modifico README.md desde netbeans, los cambios del README Visual Studio Code
 los esta tomando automaticos. 
+--------------------------------------------------------------------------------
+GUARDAR FORMULARIO DE REGISTRO
+En el controlador de registro probamos el formulario con System.out.print, y
+recibe los datos y los envia a la CONSOLA. Una vez probado, borramos los sout, 
+para conectar el controlador,instanciamos UsuarioServicio en controlador para
+que envie esos datos a el Servicio de Usuario, que tiene los metodos para
+registrar al usuario, grabarlo en la base de datos y mostrarlo en el navegador. 
+En UsuarioServicio comentamos linea de notificacion por mail hasta que la 
+creemos, .
+
 
 continuar video ...

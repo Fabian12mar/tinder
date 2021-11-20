@@ -62,7 +62,7 @@ public class UsuarioServicio implements UserDetailsService {
  
  //le damos bienvenida al usuario recien registrado
  //cuerpo de mens, titulo y mail 
-        notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
+        //notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
 
     }
 
