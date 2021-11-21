@@ -88,6 +88,30 @@ que envie esos datos a el Servicio de Usuario, que tiene los metodos para
 registrar al usuario, grabarlo en la base de datos y mostrarlo en el navegador. 
 En UsuarioServicio comentamos linea de notificacion por mail hasta que la 
 creemos, .
+--------------------------------------------------------------------------------
+VALIDAR FORMULARIOS
+Mostramos los errores en navegador, ya no por consola, creamos en controlador
+1 parametro ModelMap Modelo, la clase Modelo en Spring sirve para insertar
+en ese modelo toda la informacion que vamos a mostrar en pantalla o van a
+necesitar las interfaces de usuario. Despues en el registro Html agrego el
+mensaje de error un parrafo <p th:if de Thymeleaf, if si se cumple esta
+condicion y pasamos la variable "error" si es distinta a null, muestro el
+parrafo el tag de th:text la variable error, en al etiqueta HTML debemos poner
+esta sentencia xmlns:th="http://www.thymeleaf.org", indicamos que vamos a 
+usar los tag de Thymeleaf.
+El servicio valida, si hay un error lo pasa al controlador catch,en la 
+variable "error" en el modelo.put, y pide que se vuelva a abrir el mismo html
+, mostrando el error que pusimos en ese template o html.
+Cuando se genera un error y el controlador devuelve la misma vista, los campos
+no nos cargan lo que habia cargado el usuario, para que esa informacion no se
+pierda, en el controlador enviamos a la vista de nuevo las variables que
+habia llenado el usuario con modelo.put, y agregando en el form en los campos
+un th:value=.
+Si los datos ingresados estan correctos, podriamos enviar algun parametro al
+index, o mejor aun creamos otro template exito.html, poniendo otros mensajes
+de exito, agregamos en <h2 una variable titulo th:text= y agregamos en <p
+una variable descripcion th:text=, y en controlador mediante el metodo put de
+la clase modelo, enviamos los mensajes de exito a las variables del html.
 
 
 continuar video ...
