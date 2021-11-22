@@ -20,6 +20,7 @@ import tinder.entidades.Foto;
 import tinder.entidades.Usuario;
 import tinder.errores.ErrorServicio;
 import tinder.repositorios.UsuarioRepositorio;
+import tinder.repositorios.ZonaRepositorio;
 
 @Service
 public class UsuarioServicio implements UserDetailsService {
@@ -35,12 +36,15 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private FotoServicio fotoServicio;
+    
+    @Autowired
+    private ZonaRepositorio zonaRepositorio;
 
 //metodo registrar o CREAR 
     @Transactional
-    public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave);
+        validar(nombre, apellido, mail, clave, clave2);
 
 //si se da alguno de los errores de arriba, no se ejecuta lo siguiente
         Usuario usuario = new Usuario();
@@ -67,9 +71,9 @@ public class UsuarioServicio implements UserDetailsService {
     }
 
     @Transactional
-    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave, String clave2) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave);
+        validar(nombre, apellido, mail, clave, clave2);
 
         /* validamos que si id no existe, con el findById que nos devuelve una
  clase Optional, y reemplazamos con estas 3 lineas la cuarta, con la clase Optional 
@@ -139,7 +143,7 @@ public class UsuarioServicio implements UserDetailsService {
 
     /* creamos un metodo validar para no repetir la logica de validar de arriba,
  traemos el codigo de arriba aqui y desde registrar llamamos a este metodo*/
-    private void validar(String nombre, String apellido, String mail, String clave) throws ErrorServicio {
+    private void validar(String nombre, String apellido, String mail, String clave, String clave2) throws ErrorServicio {
 
         //validamos ingreso datos, creamos package clase e
         if (nombre == null || nombre.isEmpty()) {
@@ -154,6 +158,11 @@ public class UsuarioServicio implements UserDetailsService {
         }
         if (clave == null || clave.isEmpty() || clave.length() <= 6) {
             throw new ErrorServicio("La clave del usuario no puede ser nula y tiene que tener mas de 6 digitos");
+        }
+/* LA VALIDACION CON EQUALS DISTINTA LO ESPECIFICO CON EL SIGNO ! DELANTE DE 
+PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
+        if (!clave.equals(clave2)) {
+            throw new ErrorServicio("Las claves deben ser iguales. ");
         }
 
     }
