@@ -24,20 +24,20 @@ public class RegistroControlador {
 
     @Autowired
     private UsuarioServicio usuarioServicio;
-    
+
     @Autowired
     private ZonaRepositorio zonaRepositorio;
 
     @GetMapping("/registro")
 //metodo regitstro, responde a traves de metodo Get de https, a partir de la barra /
     public String registro(ModelMap modelo) {
-     
-/* busca todas las zonas del Repositorio en base de datos y guarda lista en
+
+        /* busca todas las zonas del Repositorio en base de datos y guarda lista en
 variable "zonas" en modelo, cuando ingresemos a url registro, el html registro
  llama desde el select a la lista "zonas"*/
         List<Zona> zonas = zonaRepositorio.findAll();
         modelo.put("zonas", zonas);
-        
+
 //abre vista
         return "registro.html";
     }
@@ -47,12 +47,12 @@ variable "zonas" en modelo, cuando ingresemos a url registro, el html registro
     /* anotamos RequestParam que son parametros de la solicitud http, tambien
     podemos indicarlo como parametro opcional. ModelMap mostramos errores en navegador */
     public String registrar(ModelMap modelo, MultipartFile archivo, @RequestParam String nombre,
-            @RequestParam String apellido, @RequestParam String mail, 
+            @RequestParam String apellido, @RequestParam String mail,
             @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
 
         //agregamos try catch porque las validaciones del servicio manejaban errores
         try {
-/* ENVIAMOS ESTOS ATRIBUTOS AL SERVICIO, EL PRIMER PARAMETRO AQUI LO 
+            /* ENVIAMOS ESTOS ATRIBUTOS AL SERVICIO, EL PRIMER PARAMETRO AQUI LO 
  ENVIAVAMOS NULL, PORQUE EL PRIMER PARAMETRO DEL SERVICIO RECIBE EL ARCHIVO DE
 FOTO, QUE NO ESTABAMOS RECIBIENDO POR AHORA */
             usuarioServicio.registrar(archivo, nombre, apellido, mail, clave1, clave2, idZona);
@@ -67,6 +67,8 @@ por navegador. "error" es nombre de variable */
             /* enviamos las variables nuevamente a la vista para que en caso de error 
  no se pierda lo que habia ingresado el usuario, en el form se agrega un 
             th:value*/
+            List<Zona> zonas = zonaRepositorio.findAll();
+            modelo.put("zonas", zonas);
             modelo.put("nombre", nombre);
             modelo.put("apellido", apellido);
             modelo.put("mail", mail);
@@ -76,7 +78,7 @@ por navegador. "error" es nombre de variable */
             return "registro.html";
         }
         /* si datos ingresados estan correctos enviamos a exito en vez de index, y
- mediante metdo put de la clase modelo enviamos al html los mensajes de 
+ mediante metodo put de la clase modelo enviamos al html los mensajes de 
  exito a traves de las variables*/
         modelo.put("titulo", "Bienvenido a Tinder de Mascotas. ");
         modelo.put("descripcion", "Tu usuario fue registrado de manera satisfactoria");

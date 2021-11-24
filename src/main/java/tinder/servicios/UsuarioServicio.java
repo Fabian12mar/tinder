@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,9 +15,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import tinder.entidades.Foto;
 import tinder.entidades.Usuario;
+import tinder.entidades.Zona;
 import tinder.errores.ErrorServicio;
 import tinder.repositorios.UsuarioRepositorio;
 import tinder.repositorios.ZonaRepositorio;
@@ -30,13 +34,13 @@ public class UsuarioServicio implements UserDetailsService {
     UsuarioRepositorio = new UsuarioRepositorio*/
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
-    
+
     @Autowired
     private NotificacionServicio notificacionServicio;
 
     @Autowired
     private FotoServicio fotoServicio;
-    
+
     @Autowired
     private ZonaRepositorio zonaRepositorio;
 
@@ -44,36 +48,40 @@ public class UsuarioServicio implements UserDetailsService {
     @Transactional
     public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave, clave2);
+        Zona zona = zonaRepositorio.getOne(idZona);
+
+        validar(nombre, apellido, mail, clave, clave2, zona);
 
 //si se da alguno de los errores de arriba, no se ejecuta lo siguiente
         Usuario usuario = new Usuario();
         usuario.setNombre(nombre);
         usuario.setApellido(apellido);
         usuario.setMail(mail);
- 
+        usuario.setZona(zona);
+
 //generamos variable 
         String encriptada = new BCryptPasswordEncoder().encode(clave);
 //al usuario lo persistimos con la clave encriptada
         usuario.setClave(encriptada);
-        
+
         usuario.setAlta(new Date());
 
         Foto foto = fotoServicio.guardar(archivo);
         usuario.setFoto(foto);
 
         usuarioRepositorio.save(usuario);
- 
- //le damos bienvenida al usuario recien registrado
- //cuerpo de mens, titulo y mail 
-        //notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
 
+        //le damos bienvenida al usuario recien registrado
+        //cuerpo de mens, titulo y mail 
+        //notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
     }
 
     @Transactional
-    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave, String clave2) throws ErrorServicio {
+    public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorServicio {
 
-        validar(nombre, apellido, mail, clave, clave2);
+                Zona zona = zonaRepositorio.getOne(idZona);
+        
+        validar(nombre, apellido, mail, clave, clave2, zona);
 
         /* validamos que si id no existe, con el findById que nos devuelve una
  clase Optional, y reemplazamos con estas 3 lineas la cuarta, con la clase Optional 
@@ -89,11 +97,12 @@ public class UsuarioServicio implements UserDetailsService {
             usuario.setApellido(apellido);
             usuario.setNombre(nombre);
             usuario.setMail(mail);
-            
+            usuario.setZona(zona);
+
             //generamos variable 
-        String encriptada = new BCryptPasswordEncoder().encode(clave);
+            String encriptada = new BCryptPasswordEncoder().encode(clave);
 //al usuario lo persistimos con la clave encriptada
-        usuario.setClave(encriptada);
+            usuario.setClave(encriptada);
 
             String idFoto = null;
             if (usuario.getFoto() != null) {
@@ -143,7 +152,7 @@ public class UsuarioServicio implements UserDetailsService {
 
     /* creamos un metodo validar para no repetir la logica de validar de arriba,
  traemos el codigo de arriba aqui y desde registrar llamamos a este metodo*/
-    private void validar(String nombre, String apellido, String mail, String clave, String clave2) throws ErrorServicio {
+    private void validar(String nombre, String apellido, String mail, String clave, String clave2, Zona zona) throws ErrorServicio {
 
         //validamos ingreso datos, creamos package clase e
         if (nombre == null || nombre.isEmpty()) {
@@ -164,6 +173,10 @@ PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
         if (!clave.equals(clave2)) {
             throw new ErrorServicio("Las claves deben ser iguales. ");
         }
+        if (zona == null) {
+            throw new ErrorServicio("No se encontro la zona solicitada. ");
+        }
+
 
     }
 
@@ -178,16 +191,24 @@ PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
             List<GrantedAuthority> permisos = new ArrayList<>();
 
-            GrantedAuthority p1 = new SimpleGrantedAuthority("MODULO_FOTOS");
+            GrantedAuthority p1 = new SimpleGrantedAuthority("ROLE_USUARIO_REGISTRADO");
             permisos.add(p1);
+            
+ //recupera los atributos del Request o solicitud http          
+            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+ //solicita los datos de sesion de esa solicitud         
+            HttpSession session = attr.getRequest().getSession(true);
+/*guardo los datos de sesion, como el objeto usuario de la solicitud, en una
+variable de sesion "usuariosession*/
+            session.setAttribute("usuariosession", usuario);
 
-            GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
+    /*        GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
             permisos.add(p2);
 
             GrantedAuthority p3 = new SimpleGrantedAuthority("MODULO_VOTOS");
-            permisos.add(p3);
+            permisos.add(p3);                                                    */
 
-    /* pasamos los datos del usuario y la lista de permisos al constructor
+            /* pasamos los datos del usuario y la lista de permisos al constructor
             de usuario de Spring Security */
             User user = new User(usuario.getMail(), usuario.getClave(), permisos);
             return user;
