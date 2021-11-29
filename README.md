@@ -506,10 +506,16 @@ GetMapping("/usuario/{id}") agrego entre llaves el id, INDICANDO QUE SERA
 PARTE DE LA URL. Y cambio el parametro del metodo (@PathVariable String id) de
 @RequestParam a @PathVariable, con esto decimos que este id lo va a sacar de lo
 que venga en el @GetMapping.
-Y en la vista perfil.html cambiamos la ruta:
-"${'/foto/usuario?id=' + perfil.id}"
+Y en la vista perfil.html: 
+"${'/foto/usuario?id=' + perfil.id}"  CAMBIAMOS LA RUTA POR:
 "${'/foto/usuario/' + perfil.id}"
 Ahora en la barra de direcciones para llamar al recurso tenemos que implementar:
+localhost:8080/foto/usuario?id=f52d5919-345b-4511-96b0-6bd96cd7c79e
+CAMBIAMOS POR: (RUTA SIN ?id=)
+localhost:8080/foto/usuario/f52d5919-345b-4511-96b0-6bd96cd7c79e
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
 
 
