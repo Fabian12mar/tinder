@@ -447,6 +447,53 @@ servicio que terminaba devolviendo una vista html.
 Escribo un Controlador Foto, que devuelve la foto de perfil de un usuario
 especifico. En el registro y en la edicion de perfil podemos ADJUNTAR FOTO AL 
 USUARIO.
+El proceso que haciamos con la foto era en Servicio Usuario, metodo modificar, 
+generabamos una foto, y se la asignabamos al usuario, llamamos a Servicio Foto, 
+metodo guardar, el cual tomaba los bytes del contenido de ese archivo , lo
+guarda en una entidad, esa entidad la enviamos a la base de datos y queda
+almacenada la foto del usuario en la base de datos.
+CREO Controlador Foto, y un metodo fotoUsuario:
+public ResponseEntity<byte[]> fotoUsuario(@RequestParam String id) {
+que nos devuelve un ResponseEntity<byte[]> de un arreglo de bytes, porque las
+fotos las persistimos como un arreglo de bytes, recibe el id del usuario, 
+busca el usuario por id, lo asigna a variable usuario, y pide al usuario la foto
+y el contenido(arreglo de bytes) y lo guardamos en una VARIABLE byte[] foto 
+byte[] foto = usuario.getFoto().getContenido();
+(LAS FOTOS EN EL HTML SE CONSUMEN COMO UNA URL)
+Ahora si se accede a /foto/usuario en el id del usuario DEBE DESCARGARSE LA FOTO.
+Y devolvemos un Return new ResponseEntity con el arreglo de byte[] y 3
+parametros:
+return new ResponseEntity<>(foto, headers, HttpStatus.OK);
+el primer parametro es el contenido, el segundo las cabeceras que le dicen al 
+navegador que lo que estoy devolviendo es una imagen, y el tercero es 
+el codigo con el que vamos a devolver el pedido, en este caso 200.
+Por los headers o cabeceras, agregamos antes del return una headers de la clase
+HttpHeaders, en el que manifiesta el ContentType de ese headers del tipo
+IMAGE_JPEG:
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.IMAGE_JPEG);
+EL RETURN MARCA ERROR PORQUE EN CASO DE QUE EXISTA UNA EXCEPCION, EN EL CATCH
+hay que devolver un ResponseEntity<> con un codigo de estado, en este caso un 
+NOT_FOUND, sea porque no se encontro un usuario con ese id, o porque el usuario
+no tenga una foto:
+return new ResponseEntity<>(foto, headers, HttpStatus.OK);
+Y agrego al try el if por si el usuario no tiene una foto:
+if (usuario.getFoto() == null) {
+seguido de la excepcion que va a capturar el catch y devolvera un NOT_FOUND
+throw new ErrorServicio("El usuario no tiene una foto asignada. ");
+AHORA SI EN BARRA DE DIRECCIONES COLOCAMOS localhost:8080/foto/usuario?id=....
+Y EL id DEL USUARIO, EL NAVEGADOR NOS DEVUELVE LA FOTO, salvo que el ContenType
+o mime este erroneo.
+--------------------------------------------------------------------------------
+AHORA USAMOS LA FOTOS
+Desde vista perfil.html, antes de la imagen del perrito, agrego un <img th:if,
+si el usuario al que le estoy intentando cambiar el perfil tiene una foto
+asignada, voy a mostrar la foto del usuario, usando la URL del Controlador Foto
+y CONCATENANDO AL FINAL DE LA URL EL id DEL PERFIL QUE ESTAMOS EDITANDO:
+<img th:if="${perfil.foto != null}" class="img-fluid rounded-circle" th:src="${'/foto/usuario?id=' + perfil.id}" alt="">
+Y la foto del perrito la vamos a mostrar siempre y cuando el usuario que estoy
+intentando modificar el perfil, no tenga una foto de perfil:
+<img th:if="${perfil.foto == null}"  class="img-fluid rounded-circle" src="/img/m1.jpeg" alt="">
 
 
 
@@ -454,4 +501,5 @@ USUARIO.
 
 
 
-continuar V9 min913
+
+continuar v11 min2020

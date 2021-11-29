@@ -102,11 +102,13 @@ public class UsuarioServicio implements UserDetailsService {
 //al usuario lo persistimos con la clave encriptada
             usuario.setClave(encriptada);
 
+//generamos una foto            
             String idFoto = null;
             if (usuario.getFoto() != null) {
                 idFoto = usuario.getFoto().getId();
             }
 
+//asignamos foto a un usuario
             Foto foto = fotoServicio.actualizar(idFoto, archivo);
             usuario.setFoto(foto);
             usuarioRepositorio.save(usuario);
