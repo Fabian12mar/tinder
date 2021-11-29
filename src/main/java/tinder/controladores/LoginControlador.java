@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 //configura cual es la url que va escuchar este controlador, a partir de la barra /
-@RequestMapping("/")
+@RequestMapping("/") //URL
 public class LoginControlador {
 
-@GetMapping("/login")
+//ESTOS METODOS /login logout ESTAN RELACIONADOS A LA Configuracion Seguridad
+@GetMapping("/login") //URL
 //metodo login, responde a traves de metodo Get de https, a partir de la barra /
 public String login(@RequestParam(required = false) String error, 
         @RequestParam(required = false) String logout, ModelMap model){

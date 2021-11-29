@@ -45,7 +45,6 @@ public class UsuarioServicio implements UserDetailsService {
     private ZonaRepositorio zonaRepositorio;
 
 //metodo registrar o CREAR 
-    @Transactional
     public void registrar(MultipartFile archivo, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorServicio {
 
         Zona zona = zonaRepositorio.getOne(idZona);
@@ -76,11 +75,10 @@ public class UsuarioServicio implements UserDetailsService {
         //notificacionServicio.enviar("Bienvenidos al tinder de mascotas! ", "Tinder de Mascotas", usuario.getMail());
     }
 
-    @Transactional
     public void modificar(MultipartFile archivo, String id, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorServicio {
 
-                Zona zona = zonaRepositorio.getOne(idZona);
-        
+        Zona zona = zonaRepositorio.getOne(idZona);
+
         validar(nombre, apellido, mail, clave, clave2, zona);
 
         /* validamos que si id no existe, con el findById que nos devuelve una
@@ -118,7 +116,6 @@ public class UsuarioServicio implements UserDetailsService {
 
     }
 
-    @Transactional
     public void deshabilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
@@ -133,7 +130,6 @@ public class UsuarioServicio implements UserDetailsService {
         }
     }
 
-    @Transactional
     public void habilitar(String id) throws ErrorServicio {
 
         Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
@@ -148,6 +144,29 @@ public class UsuarioServicio implements UserDetailsService {
         } else {
             throw new ErrorServicio("No se encontro el usuario solicitado. ");
         }
+    }
+
+    //importar la utilidad de Spring para @Transactional
+    @Transactional(readOnly = true)
+    public Usuario buscarPorId(String id) throws ErrorServicio {
+
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+            Usuario usuario = respuesta.get();
+            return usuario;
+
+        } else {
+            throw new ErrorServicio("No se encontro el usuario solicitado. ");
+        }
+
+    }
+    
+    @Transactional(readOnly=true)
+    public List<Usuario> todosLosUsuarios() {
+        
+        return usuarioRepositorio.findAll();
+        
     }
 
     /* creamos un metodo validar para no repetir la logica de validar de arriba,
@@ -168,7 +187,7 @@ public class UsuarioServicio implements UserDetailsService {
         if (clave == null || clave.isEmpty() || clave.length() <= 6) {
             throw new ErrorServicio("La clave del usuario no puede ser nula y tiene que tener mas de 6 digitos");
         }
-/* LA VALIDACION CON EQUALS DISTINTA LO ESPECIFICO CON EL SIGNO ! DELANTE DE 
+        /* LA VALIDACION CON EQUALS DISTINTA LO ESPECIFICO CON EL SIGNO ! DELANTE DE 
 PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
         if (!clave.equals(clave2)) {
             throw new ErrorServicio("Las claves deben ser iguales. ");
@@ -177,13 +196,15 @@ PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
             throw new ErrorServicio("No se encontro la zona solicitada. ");
         }
 
-
     }
 
     /* este metodo se llama cuando el ususario quiere autentificarse en la plataforma,
  Spring Security llama a este metodo, si existe un usuario con el mail
  que ingreso en el formulario le crea estos 3 permisos o accesos, y los pasa
   al constructor de usuario de spring*/
+ /* esta configuracion la va a tomar el html, NO hace referencia a cuando se
+ loguea el usuario que esta en la Configuracion Seguridad. */
+ /*IMPORTAR LA UTILIDAD DE Spring PARA UserDetails  */
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepositorio.buscarPorMail(mail);
@@ -193,22 +214,22 @@ PRIMER CLAVE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
             GrantedAuthority p1 = new SimpleGrantedAuthority("ROLE_USUARIO_REGISTRADO");
             permisos.add(p1);
-            
- //recupera los atributos del Request o solicitud http          
+
+            //recupera los atributos del Request o solicitud http          
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
- //solicita los datos de sesion de esa solicitud         
+            //solicita los datos de sesion de esa solicitud         
             HttpSession session = attr.getRequest().getSession(true);
-/*guardo los datos de sesion, como el objeto usuario de la solicitud, en una
+            /*guardo los datos de sesion, como el objeto usuario de la solicitud, en una
 variable de sesion "usuariosession*/
             session.setAttribute("usuariosession", usuario);
 
-    /*        GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
+            /*        GrantedAuthority p2 = new SimpleGrantedAuthority("MODULO_MASCOTAS");
             permisos.add(p2);
 
             GrantedAuthority p3 = new SimpleGrantedAuthority("MODULO_VOTOS");
             permisos.add(p3);                                                    */
 
-            /* pasamos los datos del usuario y la lista de permisos al constructor
+ /* pasamos los datos del usuario y la lista de permisos al constructor
             de usuario de Spring Security */
             User user = new User(usuario.getMail(), usuario.getClave(), permisos);
             return user;

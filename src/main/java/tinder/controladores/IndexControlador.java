@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 //configura cual es la url que va escuchar este controlador, a partir de la barra /
-@RequestMapping("/")
+@RequestMapping("/") //URL
 public class IndexControlador {
 
-@GetMapping("/")
+@GetMapping("/") //URL
 //metodo index, responde a traves de metodo Get de https, a partir de la barra /
 public String index(){
     

@@ -76,7 +76,8 @@ public class ErroresControlador implements ErrorController {
        
     }
 
-//este metodo da error con @Override !!!   
+//este metodo da error con @Override !!! 
+    //@Override
     public String getErrorPath() {
         return "/error"; 
     }

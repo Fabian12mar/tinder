@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/") //URL
 public class InicioControlador {
 
 @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
-@GetMapping("/inicio")
+@GetMapping("/inicio") //URL
 public String inicio(){
     return "inicio.html";
 }

@@ -30,7 +30,9 @@ public class ConfiguracionesSeguridad extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(new BCryptPasswordEncoder());
         
     }
-
+/*esta configuracion esta relacionada a como viajan los datos cuando se loguea
+el usuario, no hace referencia al httpSession configurado en Servicio Usuario 
+que lo vamos a tomar en el html*/
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -39,15 +41,20 @@ public class ConfiguracionesSeguridad extends WebSecurityConfigurerAdapter {
                 .antMatchers("/css/*", "/js/*", "/img/*", "/**").permitAll()
                 .and().formLogin()
                 .loginPage("/login") // Que formulario esta mi login
+          //cuando se loguea de forma exitosa      
                 .loginProcessingUrl("/logincheck")
                 .usernameParameter("username") // Como viajan los datos del logueo
                 .passwordParameter("password")// Como viajan los datos del logueo
-                .defaultSuccessUrl("/inicio") // A que URL viaja
+                .defaultSuccessUrl("/inicio") // A que URL viaja ACCESO
                 .permitAll()
                 .and().logout() // Aca configuro la salida
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
-                .permitAll().and().csrf().disable();
+/*asi como enviamos al ingresar a una ruta, a la salida tambien podemos darle 
+ una salida, pero hay que hacer otra configuracion */                
+               // .defaultSuccessUrl("/")
+                .permitAll()
+                .and().csrf().disable();
         
     }
 }

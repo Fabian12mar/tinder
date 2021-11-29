@@ -3,7 +3,9 @@ Ejercitacion Git con proyecto Java Spring "tinder de mascotas".
 Segundo push, creo clases servicios, y agrego entidad Foto, FotoServicio,
 FotoRepositorio, y las Relaciones de Mascota y Usuario con Foto.
 Agrego package configuraciones Clase ConfiguracionesSeguridad, para la seguridad
-del proyecto.
+del proyecto. Eesta configuracion esta relacionada a como viajan los datos
+cuando se loguea el usuario, no hace referencia al httpSession configurado en
+Servicio Usuario que lo vamos a tomar en el html.
 Creo rama DEVELOP (git checkout -b DEVELOP). Si hize modificaciones en README
 u otra en remoto tengo que traer cambios a local para poder subir nueva rama a
 remoto, traigo cambios con: git pull --rebase origin develop. Una vez traidos
@@ -17,6 +19,9 @@ usuarios mediante el UsuarioServicio, primero la clase implements la interfaz de
 Spring Security UserDetailsService, que nos obliga a implementar Override de un
 metodo  abstracto LoadByUsername, este metodo recibe el nombre del usuario,
 lo busca en el repositorio y lo transforma en un usuario de Spring Security.
+session.setAttribute("usuariosession", usuario);
+LA ANTERIOR SENTENCIA, GUARDA AL USUARIO EN EL NOMBRE DE VARIABLE
+"usuariosession".
 "SI TUVIERAMOS MAS DE UN ROL POR EJ UN USUARIO ADMINISTRADOR QUE PUDIESE POR EJ
 CREAR LAS ZONAS, AQUI A TRAVES DE ALGUN ATRIBUTO DE USUARIO DETERMINAR QUE TIPO
 DE USUARIO ES Y DEPENDIENDO DEL TIPO ES QUE PERMISOS LE ASIGNAMOS, POR AHORA
@@ -106,7 +111,9 @@ index, o mejor aun crear otro template exito.html, poniendo otros mensajes
 de exito, agregamos en <h2 una variable titulo th:text= y agregamos en <p
 una variable descripcion th:text=, y en controlador mediante el metodo put de
 la clase modelo, enviamos los mensajes de exito a las variables del html.
+
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 GUARDAR IMAGEN
 En el controlador estaba enviando null el primer parametro al servicio, 
 porque el primer parametro que recibe el servicio es el archivo foto, para 
@@ -255,6 +262,7 @@ th:if EL MODELO DE LA VISTA PEDIRA EL MENSAJE AL CONTROLADOR PARA IMPRIMIRLO.
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 AGREGAR SEGURIDAD A LOS ACCESOS A LA APLICACION (V7)
+
 Con Spring Security hacemos seguros los accesos a LAS URL.
 Hasta aqui si entro a la BARRA DE NAVEGACION y pongo localhost:8080/INICIO,
 ENTRA A LA VISTA, sin que haiga ningun usuario logueado.
@@ -269,6 +277,7 @@ a inicio.html
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 RECUPERAR Y UTILIZAR INFORMACION DE LA SESION (V8)
+
 Para mostrar datos del usuario logueado en las vistas.
 En el Servicio Usuario, en el metodo @Override LoadUserByUsername, cuando ya
 se que el usuario ingreso el username (mail) y la contraseña correcta, inserto
@@ -299,10 +308,133 @@ GRACIAS AL CONTROLADOR, CAPTURO EL FLUJO DE ERROR, Y MUESTRO UN MENSAJE
 PERZONALIZADO, QUE TAMBIEN PODRIA INCLUIR UNA IMAGEN RELACIONADA A LA PAGINA o
 algo customizado, y devuelve la vista, que toma los datos del modelo que
 inyecto en la vista con th: text""${.
+
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+REGISTRACION DE USUARIO COMPLETA (V9)
+FUNCIONALIDAD DE USUARIO REGISTRADO "CONFIGURA TU PERFIL"
+
+Saco informacion que tenemos guardada en la sesion, del usuario que esta
+logueado, puntualmente saco el ID, para que cuando presione el boton "Configura
+tu perfil" se abra una INTERFACE que contenga todos los datos, los pueda cambiar
+y los pueda persistir en la base de datos.
+Creo un CONTROLADOR USUARIO RequestMapping("/usuario"), con 2 metodos, 
+@GetMapping "/editar-perfil" y @PostMapping "/actualizar-perfil".
+Cuando se llame a /USUARIO/editar-perfil se llama el metodo METODO editarPerfil! 
+El metodo List<Zona> zonas es similar al de registrar usuarios, va a abrir un
+formulario (return "perfil.html") para EDITAR MIS DATOS DE PERFIL O DE USUARIO.
+Busca todas las zonas, las mete en el modelo, ese modelo lo va usar la vista
+perfil.html "zonas", y guardo las zonas para poder iterarlas y generar opciones
+dentro del Select de zonas.
+Recibe el id del usuario que esta logueado, y despues de listar las zonas, busca
+en la base de datos los datos del usuario logueado y lo envia al model con un
+nombre de variable "perfil", si ocurrio algun error, catch guarda el "error" en
+el model, para mostrarle al usuario lo que ocurrio.
+A esa variable "perfil" se le asigno un usuario, y en la vista perfil.html los
+th:value="${perfil.....} los toma de la variable "perfil", para los input
+nombre, apellido, mail y zona. No asi las clave1 ni clave2 que no las saca del
+"perfil" usuario (th:value="${clave1}". Guardo clave1 y clave2 por si vuelve 
+por si algun error cuando se esta editando perfil.
+LA VISTA "perfil.html" SE ESTARIA MANEJANDO CON EL Controlador Usuario 
+("/USUARIO")("/EDITAR-PERFIL") metodo editarPerfil, Y NO DESDE REGISTRO
+CONTROLADOR ("/")("/REGISTRO") que se maneja con la vista registro.html.
+Y retorna la vista "perfil.html", esta vista tiene la misma informacion del form
+de registro, pero llama a una action distinta /USUARIO/actualizar-perfil METODO
+registrar, a traves del metodo POST, el form tiene enctype="multipart, porque
+puede recibir imagenes, el form traslada el id y demas datos del usuario logueado
+th:value"${perfil.id, el "id" A TRAVES DE UN CAMPO type="hidden, NO SE MUESTRA
+EN PANTALLA VIAJA OCULTO.
+En la pagina inicio.html esta la frase "Usuario logueado" y en un <h2 saca de la
+sesion al usuario logueado y muestra eL nombre y el apellido, <h2 class=
+"masthead-subheading mb-0" th:if="${session.usuariosession != null}" th:text="$
+{session.usuariosession.nombre + ' ' + session.usuariosession.apellido}"></h2>.
+En la pagina de inicio, luego del usuario logueado, habia un boton 
+"¡Configura tu perfil!", que hasta ahora no funcionaba, configuro con una
+etiqueta th:href="@{/usuario/editar-perfil(id=__${session.usuariosession.id}__)}"
+, a la que tambien esta url puede recibir parametros de th 
+((id=__${session.usuariosession.id}__)}), en este caso el "id", que sacamos de
+la session.usuariosession.
+En las vistas o html o paginas, al posicionarnos sobre albun boton etc, en la
+parte inferior izquierda de la ventana nos muestra la ruta del link que nos va 
+a abrir ese boton, la ruta y despues del signo de pregunta "?" envia las 
+variables o parametros que abrira, en este caso el id igualado al id del 
+usuario de la sesion.
+Ahora al hacer click en boton "Configura tu perfil" nos lleva a la vista 
+perfil.html (/usuario/editar-perfil?id=...) , con los datos cargados en los 
+inputs, menos las claves, salvo si elegimos guardarla por navegador, carga la
+clave1.
+Cuando se acciona este formulario lleva al action=/usuario/ACTUALIZAR-PERFIL 
+METODO registrar en el Controlador Usuario, el segundo metodo del Controlador
+Usuario, que recibe un Model, un archivo, y los demas datos, Y A DIFERENCIA DEL
+FORMULARIO DE REGISTRO RECIBE EL id.
+Despues llama al metodo modificar de Servicio Usuario y le pasa todos los datos, 
+y si no hubo ningun error va a REDIRIGIR A INICIO "redirect:/inicio"; y si hubo
+algun error, CATCH va a volver a cargar los datos necesarios en la vista, y
+a cargar una variable "error" con el error ocurrido, y en lugar de ir al inicio,
+va a volver a perfil.html.
+Para que no se produsca error, cuando modifique el usuario se modifique tambien
+el usuario de la sesion, en el Controlador Usuario "/actualizar-perfil en metodo
+registrar agrego parametro, HttpSession session, para tener acceso y luego
+llamar a session y colocar atributo usuario nuevo, pisando asi el usuario viejo
+con los datos nuevos,  session.setAttribute("usuariosession", usuario);
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+SECURIZACION (V9)(v7)
+HACER QUE DETERMINADOS SERVICIOS O CONTROLADORES SEAN ACCEDIDOS POR USUARIOS QUE
+ADEMAS DE ESTAR LOGUEADOS, TENGAN UN ROL PARTICULAR.
+
+En el Controlador Inicio, en el que redireccionamos al usuario una vez que esta
+logueado, DETERMINAMOS QUE ESTA URL @GetMapping("/inicio) debe ser accedida 
+solamente por usuarios con el ROL 'USUARIOS REGISTRADOS', agregando anotacion:
+@PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')")
+esto estaba definido en Servicio Usuario en metodo @Override UserDetails 
+loadUserByUsername, el que se usa Spring Security para autenticar o loguear
+al usuario.
+Si tuviera un solo controlador para todas las URL, la anotacion @PreAuthorize
+la podria poner a nivel controlador o clase, public class PortalControlador,
+pero la anotacion va a ser tomada por todos los metodos de la clase, pero las 
+URL index, login, registro, DEBEN SER ACCEDIDAS POR TODOS LOS USUARIOS.
+Ahora si en la barra de direcciones anoto la URL localhost:8080/INICIO me
+redirige a la URL /LOGIN.
+Si al @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')") le cambio nombre de
+rol, ej ROLE_USUARIO_REGISTRADO2, e intento acceder loguado correctamente, me da
+error 403 "No tiene permisos para acceder al recurso. ", PORQUE CON EL USUARIO
+QUE ME LOGUIE TIENE ROL 'ROLE_USUARIO_REGISTRADO', y para consumir este servicio
+puse que se necesita'ROLE_USUARIO_REGISTRADO 2'.
+--------------------------------------------------------------------------------
+CUANDO SE INGRESA A "Configurar perfil" en la URL SE PASA EL id DEL USUARIO
+COMO PARAMETRO:
+http://localhost:8080/usuario/editar-perfil?id=f52d5919-345b-4511-96b0-6bd96cd7c79e
+si ingreso a la base de datos, y copio el id de otro usuario y lo pongo en esta
+URL, me va dejar editar el perfil de ese usuario. Esto por 2 motivos, primero 
+porque el Controlador Usuario no esta securizado (@PreAuthorize) (solo habia 
+securizado la URL /inicio),
+Y SEGUNDO, NO HE HECHO NINGUNA VALIDACION ADICIONAL PARA CORROBORAR QUE EL
+USUARIO QUE ESTA EDITANDO ESE PERFIL SEA EL USUARIO DUEÑO DE ESE PERFIL.
+Para ello primero securizar los 2 metodos de Controlador Usuario,
+@GetMapping("/editar-perfil") y @PostMapping("/actualizar-perfil"), agregandoles
+la anotacion @PreAuthorize("hasAnyRole('ROLE_USUARIO_REGISTRADO')"),
+Con esto me aseguro que solamente que ademas de que sean usuarios que esten
+logueados, sean usuarios con ese rol.
+Como SEGUNDA MEDIDA no debo permitir que el editar-perfil lo edite un usuario
+distinto del que esta logueado, para esto, en Servicio Usuario guardabamos al
+usuario en la sesion (session.setAttribute("usuariosession", usuario);), 
+para eso en el metodo editarPerfil pondremos que reciba parametro
+HttpSession session, de esta manera podremos usar el objeto session, con el cual
+haremos la validacion: pido el atributo getAttribute("usuariosession"), lo
+casteo = (Usuario) session.getAttribute("usuariosession"); y lo guardo en una
+variable "login" Usuario login = (Usuario) session.getAttribute("usuariosession");
+y valido si el login es null, quiere decir que en la sesion no hay ningun
+usuario, con lo que con esa sentencia ya no deberia estar ahi, y si no es null
+pero el id del usuario logeado no es igual al id del usuario que recibo por 
+parametro y estoy queriendo modificar ( !login.getId().equals(id)),
+lo redirecciono a return "redirect:/inicio";
+Ahora cuando me logueo e intento editar el perfil de otro usuario copiando su
+id y reemplazandolo por el mio en la URL
 
 
 
 
-continuar V8 min327
+
+continuar V9 min913

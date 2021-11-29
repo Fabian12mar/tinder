@@ -19,7 +19,7 @@ import tinder.servicios.UsuarioServicio;
 
 @Controller
 //configura cual es la url que va escuchar este controlador, a partir de la barra /
-@RequestMapping("/")
+@RequestMapping("/") //URL
 public class RegistroControlador {
 
     @Autowired
@@ -28,7 +28,7 @@ public class RegistroControlador {
     @Autowired
     private ZonaRepositorio zonaRepositorio;
 
-    @GetMapping("/registro")
+    @GetMapping("/registro") //URL
 //metodo regitstro, responde a traves de metodo Get de https, a partir de la barra /
     public String registro(ModelMap modelo) {
 
@@ -43,7 +43,7 @@ variable "zonas" en modelo, cuando ingresemos a url registro, el html registro
     }
 
     //segun lo que pusimos en form html en action
-    @PostMapping("/registrar")
+    @PostMapping("/registrar") //URL
     /* anotamos RequestParam que son parametros de la solicitud http, tambien
     podemos indicarlo como parametro opcional. ModelMap mostramos errores en navegador */
     public String registrar(ModelMap modelo, MultipartFile archivo, @RequestParam String nombre,
