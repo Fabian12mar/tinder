@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tinder.entidades.Usuario;
@@ -23,10 +24,11 @@ public class FotoControlador {
     @Autowired
     private UsuarioServicio usuarioServicio;
 
-    @GetMapping("/usuario") //URL
- //ver opcion profe Adri @GetMapping("/usuario/{id}")   
- //ver opcion profe Adri fotoUsuario(@PathVariable String id)
-    public ResponseEntity<byte[]> fotoUsuario(@RequestParam String id) {
+/*agregando el id entre llaves indicamos que el id pasa como parte de la URL, y
+cambiando el parametro del metodo de RequestParam a PathVariable indica que el
+id lo va a sacar de lo que venga en la ruta {} */
+    @GetMapping("/usuario/{id}") //URL
+    public ResponseEntity<byte[]> fotoUsuario(@PathVariable String id) {
 
         try {
             Usuario usuario = usuarioServicio.buscarPorId(id);

@@ -494,6 +494,23 @@ y CONCATENANDO AL FINAL DE LA URL EL id DEL PERFIL QUE ESTAMOS EDITANDO:
 Y la foto del perrito la vamos a mostrar siempre y cuando el usuario que estoy
 intentando modificar el perfil, no tenga una foto de perfil:
 <img th:if="${perfil.foto == null}"  class="img-fluid rounded-circle" src="/img/m1.jpeg" alt="">
+--------------------------------------------------------------------------------
+PASAR LA RUTA DE LA IMAGEN COMO UNA RUTA Y NO CON PARAMETRO DE id
+A veces por cuestiones de cache, de navegador, de comportamiento de los
+navegadores, para las busquedas para google, google no guarda los parametros de
+peticion, guarda las url completas, y como para hacer url amigables, es que no
+conviene en las imagenes usar el id como parametro sino pasarlo como una ruta
+completa y distinta para cada usuario, PASAR EL PARAMETRO COMO PARTE DE LA URL.
+Para ello en el Controlador Foto en el metodo ResponseEntity en la anotacion de 
+GetMapping("/usuario/{id}") agrego entre llaves el id, INDICANDO QUE SERA
+PARTE DE LA URL. Y cambio el parametro del metodo (@PathVariable String id) de
+@RequestParam a @PathVariable, con esto decimos que este id lo va a sacar de lo
+que venga en el @GetMapping.
+Y en la vista perfil.html cambiamos la ruta:
+"${'/foto/usuario?id=' + perfil.id}"
+"${'/foto/usuario/' + perfil.id}"
+Ahora en la barra de direcciones para llamar al recurso tenemos que implementar:
+
 
 
 
