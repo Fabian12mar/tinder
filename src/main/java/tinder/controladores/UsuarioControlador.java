@@ -66,6 +66,12 @@ agrego parametro HttpSession para tener acceso y luego llamar a session y
         Usuario usuario = null;
  
         try {
+            Usuario login = (Usuario) session.getAttribute("usuariosession");
+//si el usuario logueado es !distinto al que recibo por parametro
+        if (login == null || !login.getId().equals(id)) {
+            return "redirect:/inicio";
+        }
+        
             usuario = usuarioServicio.buscarPorId(id);
             usuarioServicio.modificar(archivo, id, nombre, apellido, mail, clave1, clave2, idZona);
 //pisa el usuario logueado con los datos nuevos            

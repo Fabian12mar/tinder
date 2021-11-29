@@ -420,10 +420,10 @@ logueados, sean usuarios con ese rol.
 Como SEGUNDA MEDIDA no debo permitir que el editar-perfil lo edite un usuario
 distinto del que esta logueado, para esto, en Servicio Usuario guardabamos al
 usuario en la sesion (session.setAttribute("usuariosession", usuario);), 
-para eso en el metodo editarPerfil pondremos que reciba parametro
-HttpSession session, de esta manera podremos usar el objeto session, con el cual
-haremos la validacion: pido el atributo getAttribute("usuariosession"), lo
-casteo = (Usuario) session.getAttribute("usuariosession"); y lo guardo en una
+Para eso en el metodo GET editarPerfil("/editar-perfil) pondremos que reciba
+parametro HttpSession session, de esta manera podremos usar el objeto session,
+con el cual haremos la validacion: pido el atributo getAttribute("usuariosession"),
+lo casteo = (Usuario) session.getAttribute("usuariosession"); y lo guardo en una
 variable "login" Usuario login = (Usuario) session.getAttribute("usuariosession");
 y valido si el login es null, quiere decir que en la sesion no hay ningun
 usuario, con lo que con esa sentencia ya no deberia estar ahi, y si no es null
@@ -431,7 +431,24 @@ pero el id del usuario logeado no es igual al id del usuario que recibo por
 parametro y estoy queriendo modificar ( !login.getId().equals(id)),
 lo redirecciono a return "redirect:/inicio";
 Ahora cuando me logueo e intento editar el perfil de otro usuario copiando su
-id y reemplazandolo por el mio en la URL
+id y reemplazandolo por el mio en la URL, me redirecciona a la pagina
+URL inicio.
+Y en el metodo POST registrar ("/actualizar-perfil) hacemos lo mismo que en el 
+anterior, evitando ya no el acceso al formulario, sino la orden de actualizar
+el perfil.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+CONTROLADOR PARA DEVOLVER UNA IMAGEN (V11)
+METODOS EN CONTROLADORES QUE DEVUELVEN ALGUN OBJETO DISTINTO A UNA VISTA HTML
+
+Hasta ahora los metodos nos han devuelto vistas html o una redireccion a un 
+servicio que terminaba devolviendo una vista html.
+Escribo un Controlador Foto, que devuelve la foto de perfil de un usuario
+especifico. En el registro y en la edicion de perfil podemos ADJUNTAR FOTO AL 
+USUARIO.
+
+
 
 
 
