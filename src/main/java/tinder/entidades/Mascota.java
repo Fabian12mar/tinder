@@ -1,4 +1,3 @@
-
 package tinder.entidades;
 //@autor FABIAN C
 
@@ -14,7 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
 import tinder.enumeraciones.Sexo;
-
+import tinder.enumeraciones.Tipo;
 
 @Entity
 public class Mascota {
@@ -23,15 +22,15 @@ public class Mascota {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
-    
+
     private String nombre;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
-private Date alta;
-    
+    private Date alta;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date baja;
-    
+
     @ManyToOne
     private Usuario usuario;
 
@@ -39,16 +38,28 @@ private Date alta;
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @Enumerated(EnumType.STRING)
+    private Tipo tipo;
+    
     @OneToOne
     private Foto foto;
 
     /**
      * get y set
      */
+    
+    public Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+    }
+
     public Foto getFoto() {
         return foto;
     }
-    
+
     public void setFoto(Foto foto) {
         this.foto = foto;
     }
@@ -56,7 +67,7 @@ private Date alta;
     public Sexo getSexo() {
         return sexo;
     }
-    
+
     public void setSexo(Sexo sexo) {
         this.sexo = sexo;
     }
@@ -64,7 +75,7 @@ private Date alta;
     public Usuario getUsuario() {
         return usuario;
     }
-    
+
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
@@ -100,11 +111,7 @@ private Date alta;
     public void setBaja(Date baja) {
         this.baja = baja;
     }
-    
-    /**
-     * 
-     */
-    
+
             
 
 }

@@ -11,6 +11,7 @@ import tinder.entidades.Foto;
 import tinder.entidades.Mascota;
 import tinder.entidades.Usuario;
 import tinder.enumeraciones.Sexo;
+import tinder.enumeraciones.Tipo;
 import tinder.errores.ErrorServicio;
 import tinder.repositorios.MascotaRepositorio;
 import tinder.repositorios.UsuarioRepositorio;
@@ -28,7 +29,7 @@ public class MascotaServicio {
     private FotoServicio fotoServicio;
 
     @Transactional
-    public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo) throws ErrorServicio {
+    public void agregarMascota(MultipartFile archivo, String idUsuario, String nombre, Sexo sexo, Tipo tipo) throws ErrorServicio {
 
         Usuario usuario = usuarioRepositorio.findById(idUsuario).get();
 
@@ -38,6 +39,8 @@ public class MascotaServicio {
         mascota.setNombre(nombre);
         mascota.setSexo(sexo);
         mascota.setAlta(new Date());
+        mascota.setUsuario(usuario);
+        mascota.setTipo(tipo);
         
         Foto foto = fotoServicio.guardar(archivo);
         mascota.setFoto(foto);
@@ -47,7 +50,7 @@ public class MascotaServicio {
     }
 
     @Transactional
-    public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo) throws ErrorServicio {
+    public void modificar(MultipartFile archivo, String idUsuario, String idMascota, String nombre, Sexo sexo, Tipo tipo) throws ErrorServicio {
 
         validar(nombre, sexo);
 
@@ -68,6 +71,8 @@ public class MascotaServicio {
                 
                 Foto foto = fotoServicio.actualizar(idFoto, archivo);
                 mascota.setFoto(foto);
+                
+                mascota.setTipo(tipo);
                 
                 mascotaRepositorio.save(mascota);
             } else {
@@ -102,6 +107,22 @@ public class MascotaServicio {
         if (sexo == null) {
             throw new ErrorServicio("El sexo de la mascota no puede ser nulo. ");
         }
+    }
+    
+    //importar la utilidad de Spring para @Transactional
+    @Transactional(readOnly = true)
+    public Mascota buscarPorId(String id) throws ErrorServicio {
+
+        Optional<Mascota> respuesta = mascotaRepositorio.findById(id);
+
+        if (respuesta.isPresent()) {
+            Mascota mascota = respuesta.get();
+            return respuesta.get();
+
+        } else {
+            throw new ErrorServicio("No se encontro la mascota solicitada. ");
+        }
+
     }
 
 }

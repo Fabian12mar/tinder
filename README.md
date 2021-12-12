@@ -516,6 +516,139 @@ localhost:8080/foto/usuario/f52d5919-345b-4511-96b0-6bd96cd7c79e
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+MODULO DE MASCOTAS 1 (v12)
+
+ESCRIBIR COMPONENTES Y VISTAS NECESARIAS PARA QUE UN USUARIO PUEDA AÑADIR n 
+CANTIDAD DE MASCOTAS
+
+HAGO UNA VISTA mascota.html PARA CARGAR LA INFORMACION DE UNA MASCOTA (hago una
+copia de la vista perfil.html de Usuario para modificarlo), la cual va a servir
+tanto para crear una Mascota como para modificarla.
+HAGO UNA Controlador Mascota (hago una copia del Controlador Usuario para
+modificarlo), 
+La notacion @PreAuthorize la escribo a nivel Controlador, porque todos los
+metodos que tengamos aca los va tener quer usar un Usuario Registrado, con el
+mismo rol que el de usuario,
+El objeto zona no es necesario.
+Metodo editar-perfil puede recibir el id de mascota por lo que al RequestParam
+agrego(required = false), el metodo recibe los parametros, añade la mascota en
+blanco, con el nombre "perfil", y devuelve return "mascota.html";
+EN LA PAGINA inicio.html agrego un nuevo boton <a ademas del de Editar Perfil,
+que sea para CREAR UNA MASCOTA:
+ <a th:href="@{/mascota/editar-perfil}" class="btn btn-primary btn-xl rounded-pill mt-5">¡Agrega una Mascota!</a>
+Si ahora me logueo, en la pagina de inicio sale nuevo boton Agrega una Mascota,
+si toco me muestra "error 500 Ocurrio un error interno", esto dice porque la
+propiedad foto no puede estar en null, este ERROR porque en Controlador Mascota
+en el metodo editarPerfil en el model solo estaba recibiendo el parametro
+ModelMap model, pero no estaba añadiendo la mascota al model:
+Añado una mascota en blanco con el nombre "perfil":
+        Mascota mascota = new Mascota();
+        model.put("perfil", mascota);
+        return "mascota.html";
+AHORA CARGA EL FORMULARIO PARA CREAR O AGREGAR UNA MASCOTA CON UN h1 "MASCOTA".
+Al titulo h1 mascota lo hago dinamico, agregando un tag <span dentro del h1:
+<span th:text="${perfil.id == null ? 'Crear' : 'Actualizar'}"></span> Mascota</h1>
+Con un th condicional que modifica el h1 segun si no vienen id h1 dira "CREAR",
+y si viene id dira "ACTUALIZAR".
+
+En paquete enumeraciones agrago una nueva enum Tipo, en la cual defino PERRO, 
+GATO, CONEJO;
+Y en la Entidad Mascota agrego el atributo:
+    @Enumerated(EnumType.STRING)
+    private Tipo tipo;
+Y AGREGAR el get y set de este atributo.
+y en Controlador Mascota, metodo editarPerfil, agrego los model.put para las
+enumeraciones Tipo y Sexo, enumeraciones que traen un metodo .values() que 
+devolvera un array de todas las enumeraciones,
+        model.put("sexos", Sexo.values());
+        model.put("tipos", Tipo.values());
+el metodo .put ENVIA A LA VISTA LOS value, a la key " " asociada,
+en la VISTA mascota.html creo 2 select para Sexo y Tipo,
+th:selected="${perfil.tipo != null && tipo == perfil.tipo}"></option> 
+si el perfil.tipo != null y el TIPO es igual perfil.tipo, select lo marca como
+seleccionado.
+--------------------------------------------------------------------------------
+PARA BOTON "ACTUALIZAR MASCOTA", en Controlador Mascota escribo METODO
+"ACTUALIZAR", con parametros de datos que en teoria recibe.
+
+Llamamos al metodo "modificar" de Servicio Mascota, en el cual recibe entre
+otros el id del usuario que va a Actualizar la mascota (login.getId()), que lo
+puedo sacar de la sesion, para lo cual aqui lo pido:
+        Usuario login = (Usuario) session.getAttribute("usuariosession");
+Y un condicional: if(id == null || id.isEmpty()) si el id es nulo o es vacio, 
+quiere decir que la mascota es nueva y llamo al Servicio "agregarMascota" para
+crearla, y si el id es distinto a nulo quiere decir que la mascota existe y
+llamo al servicio "modificar":
+mascotaServicio._______________(archivo, login.getId(), nombre, sexo, tipo);
+En Servicio Mascota agrego el metodo "buscarPorId".
+Si hay algun error, en el CATCH seteo nuevamente los datos, para cargar 
+nuevamente los datos que habia llenado el usuario, y con los modelos vuelvo a
+llenar los datos, y el mensaje de error en la vista.
+            Mascota mascota = new Mascota();
+            mascota.setId(id);
+            mascota.setNombre(nombre);
+            mascota.setSexo(sexo);
+            mascota.setTipo(tipo);
+
+            modelo.put("sexos", Sexo.values());
+            modelo.put("tipos", Tipo.values());
+            modelo.put("error", ex.getMessage());
+            modelo.put("perfil", mascota);
+
+AHORA EL METODO "agregarMascota" DEL SERVICIO CREA UNA MASCOTA.
+TAMBIEN EN CONSULTA SQL DE MASCOTA FIGURA UN foto_id AUNQUE NO HAIGA SIDO
+CARGADA, Y EN CONSULTA SQL DE FOTO SE VE EL id COMO QUE LLEGA EL Multipart, PERO
+NO TIENE CONTENIDO, LLEGA VACIO, para ello en Servicio Foto agrego una
+validacion en el if, que ademas de que el archivo NO sea nulo, tiene que NO ser
+VACIO, para que se ejecute el try del metodo guardar del Servicio Foto:
+            if (archivo != null && !archivo.isEmpty()) {
+AHORA SI CREO UNA MASCOTA SIN AGREGAR FOTO, EN LA CONSULTA SQL DE FOTO NO 
+APARECE NINGUN id DE FOTO NUEVA, Y EN LA CONSULTA SQL DE MASCOTA, AHORA LE
+FIGURA LOS CAMPOS foto_id COMO [NULL], ESTO POR EL if "NO NULO" Y "NO VACIO".
+--------------------------------------------------------------------------------
+Para probar la EDICION de una mascota, NO la creacion, aun sin haber creado la 
+vista para ello, en la barra de URL agrego un id de Mascota existente, para que 
+el controlador lo tome como id existente y llame al Servicio "modificar" !!!!!!!
+Agregando desde el ?:
+http://localhost:8080/mascota/editar-perfil?id=f6a7ecaf-6731-4157-98be-57c134058b91
+Aun asi el formulario no me carga los datos de la mascota indicada, esto porque
+en el Controlador el metodo "editarPerfil" recibe el id, pero no estaba haciendo
+nada con ese id, solo siempre crea una nueva mascota:
+ Mascota mascota = new Mascota()
+Para que el metodo tome el id, agrego un if:
+            if (id != null && !id.isEmpty()) {
+            try {
+            mascota = mascotaServicio.buscarPorId(id);
+De esta manera ahora el model.put("perfil", mascota); que tenia, va a pasar a la
+vista, con el nombre "perfil", el valor de la mascota del try, que es el id
+buscado en el Servicio.
+--------------------------------------------------------------------------------
+Por ultimo para SOLUCIONAR UN ERROR O BUG 500 error interno,
+NullPointerException: null, PORQUE SE PIERDE LA SESION CUANDO SE REINICIA EL
+SERVIDOR Y EL USUARIO DA "NULL", HAGO redirect a "inicio"
+        Usuario login = (Usuario)session.getAttribute("usuariosession");
+        if(login == null) {
+        return "redirect:/inicio";
+        }
+.............
+
+--------------------------------------------------------------------------------
+PARA QUE SE MUESTRE LA FOTO DE UNA MASCOTA,
+En Controlador Foto agrego el @GetMapping("/mascota/{id}") que es llamado o 
+consumido desde la vista mascota.html, 
+el metodo fotoMascota de este Controlador, llama al metodo buscarPorId(id) del 
+Servicio Mascota
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+MODULO DE MASCOTAS 2 (V13)
+
+AGREGO UNA VISTA PARA CONSULTAR, TODAS LAS MASCOTAS DEL USUARIO, AGREGAR,
+MODIFICAR Y ELIMINAR.
+
+Copio como base la vista mascota.html, y renombro a mascotaS.html, 
+
+    
 
 
 
@@ -525,4 +658,4 @@ localhost:8080/foto/usuario/f52d5919-345b-4511-96b0-6bd96cd7c79e
 
 
 
-continuar v11 min2020
+continuar v12 min31

@@ -18,7 +18,7 @@ public class FotoServicio {
 
     @Transactional
     public Foto guardar(MultipartFile archivo) throws ErrorServicio {
-        if (archivo != null) {
+        if (archivo != null && !archivo.isEmpty()) {
  /*creamos un try an catch por el metodo getBytes me marca que puede lanzar una
  excepcion, por si la lectura del archivo falla, imprimimos el error en la consola*/
             try {
