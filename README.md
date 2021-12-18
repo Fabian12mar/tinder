@@ -847,6 +847,12 @@ Ahora desde la vista mascotaS, puedo agregar mascotas.
 --------------------------------------------------------------------------------
 En la vista mascota AGREGO UN BOTON VOLVER, para no seguir volviendo desde el
 navegador:
+<button type="submit" class="btn btn-dark" formaction="/mascota/mis-mascotas"
+formmethod="GET" >Volver</button>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 
 
 
