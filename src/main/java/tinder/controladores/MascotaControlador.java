@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,16 +35,51 @@ public class MascotaControlador {
 
     @Autowired
     private MascotaServicio mascotaServicio;
-
+    
 //    @Autowired
 //    private ZonaRepositorio zonaRepositorio;
+    
+//metodo Eliminar MAPEADO CON DELETEmapping    
+    @PostMapping("/eliminar-perfil")
+    public String eliminar(HttpSession session, @RequestParam String id){
+        try {
+            Usuario login = (Usuario)session.getAttribute("usuariosession");
+            mascotaServicio.eliminar(login.getId(), id);
+        } catch (ErrorServicio ex) {
+            Logger.getLogger(MascotaControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "redirect:/mascota/mis-mascotas";
+        
+    }
+    
+    
+    @GetMapping("/mis-mascotas") //URL
+    public String misMascotas(HttpSession session, ModelMap model) {
+        Usuario login = (Usuario) session.getAttribute("usuariosession");
+        if(login == null) {
+            return "redirect:/login";
+        }
+        
+        List<Mascota> mascotas = mascotaServicio.buscarMascotasPorUsuario(login.
+                getId());
+        model.put("mascotas", mascotas);
+        
+        return "mascotas";
+        
+    }
+    
+    
     @GetMapping("/editar-perfil") //URL
 //recibe session para validar que login logueado sea el mismo de la session    
-    public String editarPerfil(HttpSession session, @RequestParam(required = false) String id, ModelMap model) {
+    public String editarPerfil(HttpSession session, @RequestParam(required = false) String id, @RequestParam(required = false) String accion, ModelMap model) {
+        
+        if (accion == null) {
+            accion = "Crear";
+        }
         
         Usuario login = (Usuario)session.getAttribute("usuariosession");
         if(login == null) {
-            return "redirect:/inicio";
+            return "redirect:/login";
         }
 
         //añade al model una mascota, con el nombre "perfil"
@@ -57,6 +93,7 @@ public class MascotaControlador {
         }
 
         model.put("perfil", mascota);
+        model.put("accion", accion);
 
         model.put("sexos", Sexo.values());
         model.put("tipos", Tipo.values());
@@ -107,6 +144,7 @@ agrego parametro HttpSession para tener acceso y luego llamar a session y
             mascota.setSexo(sexo);
             mascota.setTipo(tipo);
 
+            modelo.put("accion", "Actualizar");
             modelo.put("sexos", Sexo.values());
             modelo.put("tipos", Tipo.values());
             modelo.put("error", ex.getMessage());

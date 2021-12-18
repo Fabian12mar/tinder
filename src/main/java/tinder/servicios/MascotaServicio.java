@@ -2,6 +2,7 @@ package tinder.servicios;
 //@autor FABIAN C
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,5 +125,10 @@ public class MascotaServicio {
         }
 
     }
+    
+    public List<Mascota> buscarMascotasPorUsuario(String id) {
+        return mascotaRepositorio.buscarMascotasPorUsuario(id);
+    }
+    
 
 }

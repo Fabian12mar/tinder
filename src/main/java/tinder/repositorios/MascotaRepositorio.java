@@ -13,7 +13,7 @@ import tinder.entidades.Mascota;
 @Repository
 public interface MascotaRepositorio extends JpaRepository<Mascota, String>{
 
-@Query("SELECT c FROM Mascota c WHERE c.usuario.id = :id")
+@Query("SELECT c FROM Mascota c WHERE c.usuario.id = :id AND c.baja IS NULL")
 public List<Mascota> buscarMascotasPorUsuario(@Param("id") String id);
 
 }

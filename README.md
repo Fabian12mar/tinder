@@ -646,16 +646,222 @@ MODULO DE MASCOTAS 2 (V13)
 AGREGO UNA VISTA PARA CONSULTAR, TODAS LAS MASCOTAS DEL USUARIO, AGREGAR,
 MODIFICAR Y ELIMINAR.
 
-Copio como base la vista mascota.html, y renombro a mascotaS.html, 
+Copio como base la vista mascota.html, y procedo a modifical el html, primero
+renombro a mascotaS.html, y elimino el span th:text que cambiaba el comienzo del
+titulo segun si existia o no id, a Crear o Actualizar Mascota, y cambio la
+segunda parte del titulo por Mis Mascotas.
+El div de section lo hago de todo el ancho, de 6 a 2 a 12 12, y elimino las
+siguientes lineas de codigo hasta el footer, que serian las parte de mostrar
+foto y la parte del form de error y nombre, y los select tipo, sexo y input 
+archivo foto.
+Creo una <table, un<thead como ENCABEZADO, un <tr para las columnas y un <th
+como nombre del encabezado cada columna(nombre, sexo y tipo). Un <body, y un
+<tr th:each="mascota : ${mascotas}"> QUE VA A MOSTRAR UNA MASCOTA POR CADA FILA,
+un <td que indica en CADA COLUMNA que atributos mostrar (nombre, sexo y tipo).
+--------------------------------------------------------------------------------
+En Controlador Mascota creo metodo misMascotas, @GetMapping("/mis-mascotas"), el
+cual va recibir la session y el modelo de la vista. Modelo en vista mascotas:
+                        <tr th:each="mascota : ${mascotas}">
+                        <td th:text="${mascota.nombre}"></td>
+                        <td th:text="${mascota.sexo}"></td>
+                        <td th:text="${mascota.tipo}"></td>
+                        </tr>
+el <td es el modelo de th que llama al atributo de cada columna.
+Recupera el usuario logueado, y si es null vuelve a "login":
+               Usuario login = (Usuario) session.getAttribute("usuariosession");
+               if(login == null) {
+               return "redirect:/login";
+               }
+ESTE REDIRECT LO CORRIJO EN METODO editarerfil DE redirect:usuario a "login".
+Si el usuario no es null llamo al metodo buscarMascotasPorUsuario del Servicio
+mascota que guardo en un List:
+List<Mascota> mascotas = mascotaServicio.buscarMascotasPorUsuario(login.getId());
+y a ese List lo pongo en el model de la vista:
+                                     model.put("mascotas", mascotas);
+Vista mascotas que va a recorrer la List:
+                    <tr th:each="mascota : ${mascotas}">
+Y return "mascotas";
+--------------------------------------------------------------------------------
+En Servicio Mascota escribo el metodo buscarMascotasPorUsuario, que llama el
+Controlador, el metodo devuelve un List de mascotas, recibe el id del usuario,
+y retorna de la interface Repositorio Mascota del metodo buscarMascotasPorUsuario
+el cual recibe el id del usuario:
+@Repository
+public interface MascotaRepositorio extends JpaRepository<Mascota, String>{
+@Query("SELECT c FROM Mascota c WHERE c.usuario.id = :id")
+public List<Mascota> buscarMascotasPorUsuario(@Param("id") String id);
+--------------------------------------------------------------------------------
+Ahora al loguearme, y en la barra de URL al colocar
+http://localhost:8080/mascota/mis-mascotas
+me da la tabla con la lista de Mis Mascotas.
+Voy a la vista mascotas.html para darle estilo a esta tabla:
+            <table class="table table-light table-hover">
+hover hace que al pasar el cursor por encima de una fila la encienda.
+Doy estilo a los encabezados <tr:
+                    <tr class="bg-black  text-white">
+                        <th>Nombre</th>
+Agrego a la tabla una columna mas que nos de botones para accionar sobre los 
+registros (modificar, eliminar):
+                        <th>Acciones</th>
+y un <td th: para esta nueva columna, con UN LINK Editar y href a URL:
+(esta URL parecida a la de la vista inicio.html)
+(ESTA URL RECIBE EL id DE LA MASCOTA QUE ESTAMOS ITERANDO EN ESTE MOMENTO)
+<td><a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__}}">Editar</a></td>
+Este boton Editar nos lleva a la pagina de "Actualizar Mascota", esto seria
+porque esta recibiendo un id.
+..................
 
+Agrego otro <td th: para el boton Eliminar, EN LA MISMA COLUMNA <th Acciones:
+<td><a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__)}">Editar</a></td>
+<td><a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__)}">Eliminar</a></td>-->
+ESTAS URL RECIBE EL id DE LA MASCOTA QUE ESTAMOS ITERANDO EN ESTE MOMENTO)
+MANERA CORRECTA!!!!: (LA ANTERIOR ME GENERA DOS COLUMNAS PARA LA COLUMNA
+ <th Acciones-->)
+<td>
+<a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__)}">Editar</a> -
+<a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__)}">Eliminar</a>
+</td>
+Agrego otra columna mas para la foto:
+                        <th>Foto</th>
+Y un <td th: para el contenido del atributo de esa columna, con la URL a la
+foto, este <td lo copio de la vista mascota por ser similar:
+(solo cambio perfil por mascota. y mascota.id, esto quiere decir SI LA 
+MASCOTA QUE ESTAMOS ITERANDO TIENE FOTO LA MUESTRO, SINO EN LA SEGUNDA
+LINEA DIGO QUE SI NO TIENE FOTO MUESTRE LA FOTO GENERICA)
+(Para que imagenes no rompan tabla agrego un tamaño, y un estilo de borde
+solo para dar estilo redondo)
+<td>
+<img th:if="${mascota.foto != null}" th:src="${'/foto/mascota/' + mascota.id}" alt="" style="max-height:150px; border-radius: 100%">
+<img th:if="${mascota.foto == null}" src="/img/m1.jpeg" alt="" style="max-height: 150px; border-radius: 100%"> 
+</td>
+--------------------------------------------------------------------------------
+En mascotA html hago cambio en:
+<header>
+      <h1 style="margin-top:80px; text-align: center;"><span th:text="${perfil.
+id == null ? 'Crear' : 'Actualizar'}"></span> Mascota</h1>
+  </header>
+Cambio el modelo perfil que segun si hay o no id cambia el titulo de Crear a
+Actualizar, por un modelo accion {accion:
+      <h1 style="margin-top:80px; text-align: center;"><span th:text="${accion}"
+></span> Mascota</h1>
+--------------------------------------------------------------------------------
+Y en Controlador Mascota en metodo editar-perfil, agrego a recibir parametro
+String accion, y este parametro lo voy a meter en el modelo, y con este modelo
+voy a determinar el titulo y ..........
+
+        if (accion == null) {
+            accion = "Crear";
+        }
+Este modelo llama la accion del if anterior.
+        model.put("accion", accion);
+Y en el metodo Actualizar agrego el modelo:
+            modelo.put("accion", "Actualizar");
+--------------------------------------------------------------------------------
+En mascotA html modifico la siguiente linea:
+<br/><button type="submit" class="btn btn-primary">Actualizar Mascota</button>
+agrego th:if en 3 modelos que si el modelo accion es igual a esos valores,
+muestre el correspondiente boton submit, Crear, Actualizar o Eliminar; al boton
+Eliminar le cambio el estilo a btn-danger:
+<br/><button th:if="${accion == 'Crear'}" type="submit" class="btn btn-primary">Crear Mascota</button>
+<br/><button th:if="${accion == 'Actualizar'}" type="submit" class="btn btn-primary">Actualizar Mascota</button>
+<br/><button th:if="${accion =='Eliminar'}" type="submit" class="btn btn-danger">Eliminar Mascota</button>
+En etiqueta de <form saco el action:
+<form action="/mascota/actualizar-perfil" method="POST" enctype="multipart/form-data">
+y lo llevo a los 3 botones submit PERO CON EL NOMBRE DE "formaction", formaction
+que dice que si estoy Creando o Acualizando ME LLEVE a /mascota/ACTUALIZAR-perfil,
+y que si estoy Eliminando ME LLEVE a /mascota/ELIMINAR-perfil,
+tambien de etiqueta de <form saco method="POST" y lo llevo a nivel button, a los
+3 submit PERO CON EL NOMBRE DE "formmethod", formmethod que en el caso de
+Eliminar es method "DELETE":
+<br/><button th:if="${accion == 'Crear'}" type="submit" class="btn btn-primary" formaction="/mascota/actualizar-perfil" formmethod="POST">Crear Mascota</button>
+<br/><button th:if="${accion == 'Actualizar'}" type="submit" class="btn btn-primary" formaction="/mascota/actualizar-perfil" formmethod="POST">Actualizar Mascota</button>
+<br/><button th:if="${accion =='Eliminar'}" type="submit" class="btn btn-danger" formaction="/mascota/eliminar-perfil" formmethod="DELETE">Eliminar Mascota</button>
+--------------------------------------------------------------------------------
+En Controlador Mascota creo el metodo eliminar:
+Recibe id de la mascota, llama al metodo eliminar del Servicio Mascota que
+recibe el id del usuario logueado y el id de la mascota que quiero eliminar, 
+el metodo del Servicio marca que puede tirar una Excepcion por lo que lo 
+encierro en un try catch, y haiga o no haiga error hago un return a misma URL: 
+//metodo Eliminar MAPEADO CON DELETEmapping !!!!!!!!!!!!!  
+    @DeleteMapping("/eliminar-perfil")
+    public String eliminar(HttpSession session, @RequestParam String id){
+        try {
+            Usuario login = (Usuario)session.getAttribute("usuariosession");
+            mascotaServicio.eliminar(login.getId(), id);
+        } catch (ErrorServicio ex) {
+Logger.getLogger(MascotaControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "redirect:/mascota/mis-mascotas";
+        
+    }
+--------------------------------------------------------------------------------
+Por lo anterior modifico vista mascotaS,
+en estos Links "Editar" y "Eliminar" agrego un accion a Actualizar y Eliminar:
+<td>
+<a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__,accion=Actualizar)}">Editar</a> -
+<a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__),accion=Eliminar)}">Eliminar</a>
+</td>
+--------------------------------------------------------------------------------
+Para cuando la ACCION sea eliminar:
+En la vista mascota, agrego en el form en el input foto un condicional para
+eliminar el campo o input de la foto: th:if="${accion != 'Eliminar'}"
+Y el mismo if lo agrego en el label foto, para no se muestre la palabra Foto.
+Y el mismo if tambien agrego a los option de select tipo y sexo, y a input de
+nombre, para mostrar los campos pero desabilitados para cambiar los datos antes
+ingresados: th:disabled="${accion == 'Eliminar'}"
+Ahora cuando toque boton Eliminar Mascota el unico campo o input del form que va
+a viajar son los que no esten disable desabilitados, en este caso va a ser el
+input tipo hidden con el ID !!!
+                      <input type="hidden" name="id" th:value="${perfil.id}"/>
+
+Al tocar Eliminar Mascota da un error 405, visto en pila errores de output:
+org.springframework.boot.web.servlet.error.DefaultErrorAttributes.ERROR:
+org.springframework.web.HttpRequestMethodNotSupportedException: Request method
+'GET' not supported
+Consultado en base de datos la mascota no se elimino, no tiene fecha de baja,
+esta NULL. Para corregir esto en Controlador Mascota, en metodo eliminar, el 
+@DeleteMapping("/eliminar-perfil) lo cambio por @PostMapping, al igual como
+tiene el de metodo actualizar,
+Ahora el eliminar funciona, en la base de datos en campo baja le aparece fecha
+de baja, PERO LA VISTA ME LO SIGUE MOSTRANDO, PARA CORREGIR ESTO,
+Desde Repositorio Mascota, el metodo buscarMascotasPorUsuario esta trayendo 
+todas las mascotas de un usuario, falto una condicion en la Query SELECT:
+AND c.baja IS NULL, esto quiere decir que no esta eliminada la mascota.
+Ahora la vista no muestra el registro que tiene baja. Tambien puedo desde 
+Netbeans desde el llamado de la base de datos, boton derecho sobre el campo-
+registro "Baja" - Set to NULL, y guardo desde cuadro Commit Record(s), ahora
+en el navegador la vista me vuelve a mostrar la mascota que habia eliminado.
+--------------------------------------------------------------------------------
+AGREGO EL BOTON AGREGAR MASCOTA EN LA VISTA mascotas:
+De la vista inicio copio este boton "¡Agrega una Mascota!", y lo copio en vista
+mascotaS arriba de la tabla, y agrego un <br/> salto de linea:
+<a th:href="@{/mascota/editar-perfil}" class="btn btn-primary btn-xl rounded-pill mt-5">¡Agrega una Mascota!</a>
+<br/>
+Y en el boton de la vista inicio cambio la ruta de mascota/editar-perfil a
+mascota/mis-mascotas, y cambio el texto del boton de Agrega una Mascota a
+"¡Mis Mascotas!.
+En la vista mascotaS modifico el boton "¡Agrega una Mascota"! agregado antes,
+desde el inspector, Estilos, agrego float, margin y padding, y lo agregado en
+Elementos copio style=... y pego en Netbeans en boton "¡Agrega una Mascota"!
+Ahora desde la vista mascotaS, puedo agregar mascotas.
+--------------------------------------------------------------------------------
+En la vista mascota AGREGO UN BOTON VOLVER, para no seguir volviendo desde el
+navegador:
+
+
+
+
+
+
+
+
+
+
+  
     
 
 
 
 
 
-
-
-
-
-continuar v12 min31
+continuar v13 min2710
