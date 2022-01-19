@@ -89,15 +89,16 @@ creemos, .
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 VALIDAR FORMULARIOS
+En la etiqueta HTML debemos poner la sentencia
+xmlns:th="http://www.thymeleaf.org", indicamos que vamos a usar los tag de
+Thymeleaf.
 Mostramos los errores en navegador, ya no por consola, creamos en controlador
 1 objeto ModelMap Modelo, la clase Modelo en Spring sirve para insertar
 en ese modelo toda la informacion que vamos a mostrar en pantalla o van a
 necesitar las interfaces de usuario. Despues en el registro Html agrego el
 mensaje de error un parrafo <p th:if de Thymeleaf, if si se cumple esta
 condicion y paso la variable "error" si es distinta a null, muestro el
-parrafo el tag de th:text la variable error, en al etiqueta HTML debemos poner
-esta sentencia xmlns:th="http://www.thymeleaf.org", indicamos que vamos a 
-usar los tag de Thymeleaf.
+parrafo el tag de th:text la variable error. 
 El servicio valida, si hay un error lo pasa al controlador catch,en la 
 variable "error" en el modelo.put, y pide que se vuelva a abrir el mismo html
 , mostrando el error que pusimos en ese template o html.
@@ -848,7 +849,7 @@ Ahora desde la vista mascotaS, puedo agregar mascotas.
 En la vista mascota AGREGO UN BOTON VOLVER, para no seguir volviendo desde el
 navegador:
 <button type="submit" class="btn btn-dark" formaction="/mascota/mis-mascotas"
-formmethod="GET" >Volver</button>
+form method="GET" >Volver</button>
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -867,6 +868,13 @@ corregido lo que se rompia:
 box-sizing: content-box; 
 Columna Acciones tenia en box-sizing: border-box; 
 Las demas columnas tenian CONTENT-box
+VER ARCHIVOS QUE MODIFIQUE EN IDE (NETBEANS 8.2) PARA QUE TOME CAMBIOS CSS,
+bootstrap.css y bootstrap.min.css, ESTOS CAMBIOS CSS EN IDE NETBEANS 8.2
+NO LOS TOMA CHROME, NI MOZILLA, NI OPERA, LOS TOMA SOLO CUANDO LEVANTO OTRA VEZ
+PROYECTO (SPRING BOOT RUN). SI TOMÓ LOS CAMBIOS SIN LEVANTAR OTRA VEZ EL 
+PROYECTO "INTERNET EXPLORER" !!!
+
+
 
 
 
