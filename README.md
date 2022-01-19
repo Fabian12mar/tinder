@@ -852,6 +852,22 @@ formmethod="GET" >Volver</button>
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+Entidad Mascota agrego atributo Boolean activo, y sus metodos get y set.
+En la vista de "log in" agrego boton "volver" hacia "/" index.
+En la vista de registro igual.
+En la vista Mis Mascotas agrego una columna Estado, para el Boolean activo, al
+agregar esta, la columna anterior (Acciones con Editar-Eliminar) se rompe el 
+Editar-Eliminar, llendose para abajo Eliminar,
+para corregir esto desde el inspector busque, no encontre en arbol Projects,
+encontrado en Files-main-resources-static-vendor-bootstrap-css-bootstrap-rebbot.min.css
+(https://stackoverflow.com/questions/48946613/how-is-bootstrap-v4-loading-reboot-scss)
+(https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map)
+En este archivo cambie, en la columna Acciones, lo que en el inspector habia
+corregido lo que se rompia:
+box-sizing: content-box; 
+Columna Acciones tenia en box-sizing: border-box; 
+Las demas columnas tenian CONTENT-box
+
 
 
 
@@ -870,4 +886,4 @@ formmethod="GET" >Volver</button>
 
 
 
-continuar v13 min2710
+continuar 

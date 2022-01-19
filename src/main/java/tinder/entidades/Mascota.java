@@ -43,10 +43,19 @@ public class Mascota {
     
     @OneToOne
     private Foto foto;
+    
+    private boolean activo;
 
     /**
      * get y set
      */
+    public Boolean activo() {
+        return activo;
+    }
+    
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
     
     public Tipo getTipo() {
         return tipo;

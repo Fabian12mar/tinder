@@ -10,7 +10,7 @@
 
   <title>Tinder de Mascota - Registro</title>
 
-  <!-- Bootstrap core CSS -->
+        <!-- Bootstrap core CSS -->
   <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom fonts for this template -->
@@ -20,6 +20,7 @@
   <!-- Custom styles for this template -->
   <link href="/css/one-page-wonder.min.css" rel="stylesheet">
 
+ 
 </head>
 
 <body>
@@ -65,6 +66,7 @@
                         <th>Sexo</th>
                         <th>Tipo</th>
                         <th>Acciones</th>
+                        <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,8 +86,9 @@
  <!--ESTAS URL RECIBE EL id DE LA MASCOTA QUE ESTAMOS ITERANDO EN ESTE MOMENTO-->     
 <!--MANERA CORRECTA!!!! LA ANTERIOR ME GENERA DOS COLUMNAS PARA LA COLUMNA <th Acciones-->
                         <td>
-                        <a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__,accion=Actualizar)}">Editar</a> -
-                        <a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__,accion=Eliminar)}">Eliminar</a>
+                        <a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__,accion=Actualizar)}">Editar</a>
+                        - <a th:href="@{/mascota/editar-perfil(id=__${mascota.id}__,accion=Eliminar)}">Eliminar</a>
+                        
                         </td> 
                         
 
